@@ -9,13 +9,38 @@ from core.variance import (
     calculate_profit_impact,
     get_category_transactions
 )
+from pathlib import Path
 
+from backend.database import Base, engine
+from core.ingestion import load_transactions_from_excel
 
 
 
 app = FastAPI(
     title="Finz Financial Review API"
 )
+
+DATA_FILE = (
+    Path(__file__).resolve().parents[1]
+    / "data"
+    / "transactions.xlsx"
+)
+
+
+@app.on_event("startup")
+def initialize_database():
+
+    Base.metadata.create_all(bind=engine)
+
+    if not DATA_FILE.exists():
+        raise FileNotFoundError(
+            f"Transaction dataset not found: {DATA_FILE}"
+        )
+
+    load_transactions_from_excel(DATA_FILE)
+
+
+
 
 
 @app.get("/")
