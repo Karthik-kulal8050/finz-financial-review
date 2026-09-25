@@ -120,3 +120,49 @@ Month	Gross Revenue	Net Revenue	Gross Profit	Operating Profit
 January 2026	$128,821.61	$126,399.09	$82,425.32	$14,470.53
 February 2026	$127,569.49	$125,617.29	$78,606.40	$6,007.96
 March 2026	$154,122.87	$150,535.07	$98,486.43	$18,852.14
+
+## AI Financial Analyst
+
+The application includes a Gemini-powered AI Financial Analyst that allows users to ask natural-language questions about the financial data.
+
+Examples:
+
+- Why did operating profit change from January 2026 to February 2026?
+- What was our operating profit in March 2026?
+- What was our revenue in February 2026?
+- Why did operating profit change from February 2026 to March 2026?
+
+### AI Architecture
+
+The application separates deterministic financial computation from AI-generated explanation.
+
+```text
+User Question
+      |
+      v
+Streamlit Frontend
+      |
+      v
+FastAPI Backend
+      |
+      v
+SQLite Database
+      |
+      v
+Python Financial Logic
+      |
+      +-------------------+
+      |                   |
+      v                   v
+   Monthly P&L       Variance / Profit Impact
+      |                   |
+      +---------+---------+
+                |
+                v
+        Verified Financial Data
+                |
+                v
+           Gemini API
+                |
+                v
+      Natural Language Explanation
