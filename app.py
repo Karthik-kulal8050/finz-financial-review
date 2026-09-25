@@ -8,13 +8,10 @@ import plotly.express as px
 from ai.agent import ask_financial_analyst
 
 
-if "API_URL" in st.secrets:
-    API_URL = st.secrets["API_URL"]
-else:
-    API_URL = os.getenv(
-        "API_URL",
-        "http://127.0.0.1:8000"
-    )
+API_URL = os.getenv(
+    "API_URL",
+    "http://127.0.0.1:8000"
+)
 
 
 st.set_page_config(
