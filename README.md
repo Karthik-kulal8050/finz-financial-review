@@ -4,6 +4,10 @@ A financial review application that analyzes transaction data, automatically cat
 
 ---
 
+## Live Demo
+
+[Open Finz Financial Review]https://finz-financial-review-ntmhd2syjj9cwfabpd4eev.streamlit.app/
+
 ## Overview
 
 Finz is designed to help a business review transaction data and understand its financial performance without manually analyzing every transaction.
