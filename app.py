@@ -96,7 +96,7 @@ if page == "Dashboard":
             st.divider()
 
             # -----------------------------------------
-            # MONTHLY P&L
+            # MONTHLY P&L.
             # -----------------------------------------
 
             st.subheader("Monthly P&L")
