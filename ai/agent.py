@@ -9,6 +9,8 @@ from ai.tools import (
     get_monthly_variance,
     get_profit_impact
 )
+import requests
+
 
 load_dotenv()
 
@@ -149,62 +151,117 @@ def execute_tool(name, arguments):
 # AI FINANCIAL ANALYST
 # ---------------------------------------------------------
 
-def ask_financial_analyst(user_question):
+def ask_financial_analyst(user_question, api_url):
+    """
+    Ask Gemini to analyze financial data retrieved
+    from the FastAPI backend.
+    """
 
-    config = types.GenerateContentConfig(
-        system_instruction=SYSTEM_PROMPT,
-        tools=[tools],
-        temperature=0.2
+    question = user_question.lower()
+
+    # -------------------------------------------------
+    # Get monthly P&L from FastAPI
+    # -------------------------------------------------
+
+    pnl_response = requests.get(
+        f"{api_url}/pnl",
+        timeout=30
     )
 
-    chat = client.chats.create(
-        model=MODEL_NAME,
-        config=config
-    )
+    pnl_response.raise_for_status()
 
-    response = chat.send_message(user_question)
+    pnl_data = pnl_response.json()
 
-    while True:
+    # -------------------------------------------------
+    # Detect whether the user asked for a month-to-month
+    # comparison
+    # -------------------------------------------------
 
-        function_calls = []
+    month_map = {
+        "january": "2026-01",
+        "february": "2026-02",
+        "march": "2026-03"
+    }
 
-        for part in response.candidates[0].content.parts:
+    found_months = []
 
-            if part.function_call:
+    for month_name, month_value in month_map.items():
 
-                function_calls.append(
-                    part.function_call
-                )
+        if month_name in question:
+            found_months.append(month_value)
 
-        if not function_calls:
-            break
+    found_months = list(dict.fromkeys(found_months))
 
-        tool_responses = []
+    variance_data = []
+    profit_impact_data = []
 
-        for function_call in function_calls:
+    if len(found_months) >= 2:
 
-            name = function_call.name
+        previous_month = found_months[0]
+        current_month = found_months[1]
 
-            arguments = dict(
-                function_call.args
-            )
-
-            result = execute_tool(
-                name,
-                arguments
-            )
-
-            tool_responses.append(
-                types.Part.from_function_response(
-                    name=name,
-                    response={
-                        "data": result
-                    }
-                )
-            )
-
-        response = chat.send_message(
-            tool_responses
+        variance_response = requests.get(
+            f"{api_url}/variance",
+            params={
+                "previous_month": previous_month,
+                "current_month": current_month
+            },
+            timeout=30
         )
+
+        variance_response.raise_for_status()
+
+        variance_result = variance_response.json()
+
+        variance_data = variance_result.get(
+            "variance",
+            []
+        )
+
+        profit_impact_data = variance_result.get(
+            "profit_impact",
+            []
+        )
+
+    # -------------------------------------------------
+    # Build context for Gemini
+    # -------------------------------------------------
+
+    financial_context = {
+        "monthly_pnl": pnl_data,
+        "variance": variance_data,
+        "profit_impact": profit_impact_data
+    }
+
+    prompt = f"""
+You are the AI Financial Analyst for a restaurant
+financial review application.
+
+Answer the user's question using ONLY the financial
+data provided below.
+
+IMPORTANT RULES:
+
+1. Never invent financial numbers.
+2. Do not calculate new financial totals yourself.
+3. Treat the provided Python/API results as the source
+   of truth.
+4. Format monetary values with $ and two decimal places.
+5. Clearly explain the relevant financial drivers.
+6. Distinguish facts from interpretation.
+7. If the provided data is insufficient, say so.
+8. Keep the answer concise and understandable.
+
+USER QUESTION:
+{user_question}
+
+FINANCIAL DATA:
+{json.dumps(financial_context, indent=2)}
+"""
+
+    response = client.models.generate_content(
+        model=MODEL_NAME,
+        contents=prompt
+    )
 
     return response.text

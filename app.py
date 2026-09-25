@@ -12,7 +12,8 @@ API_URL = os.getenv(
     "API_URL",
     "http://127.0.0.1:8000"
 )
-
+if not API_URL:
+    API_URL = "http://127.0.0.1:8000"
 
 st.set_page_config(
     page_title="Finz Financial Review",
@@ -548,8 +549,10 @@ elif page == "AI Financial Analyst":
 
             with st.spinner("Analyzing financial data..."):
 
-                answer = ask_financial_analyst(question)
-
+                answer = ask_financial_analyst(
+                    question,
+                    API_URL
+                )
             st.markdown("### Financial Analyst")
 
             safe_answer = answer.replace("$", "USD ")
