@@ -1,0 +1,11 @@
+pandas
+openpyxl
+fastapi
+uvicorn
+sqlalchemy
+streamlit
+requests
+plotly
+python-dotenv
+google-genai
+pytest
