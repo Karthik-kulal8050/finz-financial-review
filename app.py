@@ -121,7 +121,7 @@ if page == "Dashboard":
 
             st.dataframe(
                 display_pnl,
-                width=True,
+                use_container_width=True,
                 hide_index=True
             )
 
@@ -178,7 +178,7 @@ elif page == "Transactions":
 
         st.dataframe(
             transactions,
-            width=True
+            use_container_width=True
         )
 
     else:
@@ -223,7 +223,7 @@ elif page == "Review Queue":
 
             st.dataframe(
                 review_df,
-                width=True,
+                use_container_width=True,
                 hide_index=True
             )
 
@@ -407,7 +407,7 @@ elif page == "Variance Analysis":
 
             st.dataframe(
                 variance,
-                width=True,
+                use_container_width=True,
                 hide_index=True
             )
 
@@ -423,7 +423,7 @@ elif page == "Variance Analysis":
 
             st.dataframe(
                 profit_impact,
-                width=True,
+                use_container_width=True,
                 hide_index=True
             )
 
@@ -445,7 +445,7 @@ elif page == "Variance Analysis":
 
             st.plotly_chart(
                 chart,
-                width=True
+                use_container_width=True
             )
             st.divider()
 
@@ -488,7 +488,7 @@ elif page == "Variance Analysis":
 
                     st.dataframe(
                         transaction_df,
-                        width=True,
+                        use_container_width=True,
                         hide_index=True
                     )
 
